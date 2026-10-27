@@ -1,0 +1,11 @@
+# Build output contains the game's own data files - distribute via Nexus only.
+dist/
+*.pak
+*.zip
+
+# Local extraction scratch
+extracted/
+scratch/
+
+__pycache__/
+*.pyc
