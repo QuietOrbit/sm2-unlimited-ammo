@@ -1,5 +1,5 @@
 UNLIMITED AMMO - Warhammer 40,000: Space Marine 2
-Version {version} - built for game build {game_build}
+Version {version} - works on game patch {game_version}
 {author_line}
 WHAT IT DOES
 ------------

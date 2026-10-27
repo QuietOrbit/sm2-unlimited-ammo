@@ -9,7 +9,6 @@ Builds the paks from your installed game, then writes to dist/:
 
 Bump VERSION for every upload.
 """
-import re
 import sys
 import zipfile
 from pathlib import Path
@@ -18,6 +17,7 @@ from xml.sax.saxutils import escape
 import build_mod as b
 
 VERSION = "1.0.0"
+GAME_VERSION = "15.2"  # game patch this release was tested on
 AUTHOR = ""  # your Nexus username
 MOD_NAME = "Unlimited Ammo"
 NEXUS_URL = ""  # fill in after creating the Nexus page
@@ -33,12 +33,6 @@ AMMO_OPTIONS = [
 ]
 GRENADE_OPTION = ("3 - Unlimited Grenades", b.PAK_GRENADES, "Unlimited Grenades",
                   "Frag, krak and shock grenades never run out.")
-
-
-def game_build(game: Path) -> str:
-    manifest = game.parent.parent / f"appmanifest_{b.STEAM_APP_ID}.acf"
-    m = re.search(r'"buildid"\s+"(\d+)"', manifest.read_text(encoding="utf-8")) if manifest.exists() else None
-    return m.group(1) if m else "unknown"
 
 
 def plugin(name: str, desc: str, folder: str | None, pak: str | None, default: str) -> str:
@@ -80,21 +74,21 @@ def module_config() -> str:
 """
 
 
-def info_xml(build: str) -> str:
+def info_xml() -> str:
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <fomod>
   <Name>{escape(MOD_NAME)}</Name>
   <Author>{escape(AUTHOR)}</Author>
   <Version>{VERSION}</Version>
   <Website>{escape(NEXUS_URL)}</Website>
-  <Description>Unlimited ammo, no-reload and unlimited grenade options. Built for game build {build}.</Description>
+  <Description>Unlimited ammo, no-reload, and unlimited grenade options. Works on game patch {GAME_VERSION}.</Description>
 </fomod>
 """
 
 
-def fill(template: str, build: str) -> str:
+def fill(template: str) -> str:
     author_line = f"by {AUTHOR}\n" if AUTHOR else ""
-    return (template.replace("{version}", VERSION).replace("{game_build}", build)
+    return (template.replace("{version}", VERSION).replace("{game_version}", GAME_VERSION)
             .replace("{author_line}", author_line))
 
 
@@ -103,14 +97,13 @@ def main() -> int:
     if game is None:
         print("Couldn't find Space Marine 2 through Steam.")
         return 1
-    build = game_build(game)
     b.build(game / "client_pc" / "root" / "paks" / "client" / "default" / "default_other.pak")
 
-    readme = fill((TEMPLATES / "README.txt").read_text(encoding="utf-8"), build).replace("\n", "\r\n")
+    readme = fill((TEMPLATES / "README.txt").read_text(encoding="utf-8")).replace("\n", "\r\n")
 
     main_zip = b.DIST / f"UnlimitedAmmo-{VERSION}.zip"
     with zipfile.ZipFile(main_zip, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("fomod/info.xml", info_xml(build))
+        z.writestr("fomod/info.xml", info_xml())
         z.writestr("fomod/ModuleConfig.xml", module_config())
         for folder, pak, _, _ in AMMO_OPTIONS + [GRENADE_OPTION]:
             z.write(b.DIST / pak, f"{folder}/{pak}")
@@ -126,7 +119,7 @@ def main() -> int:
     print(f"wrote {patcher_zip}")
 
     desc = b.DIST / "nexus_description.txt"
-    desc.write_text(fill((TEMPLATES / "nexus_description.txt").read_text(encoding="utf-8"), build), encoding="utf-8")
+    desc.write_text(fill((TEMPLATES / "nexus_description.txt").read_text(encoding="utf-8")), encoding="utf-8")
     print(f"wrote {desc}")
     if not AUTHOR:
         print("note: AUTHOR is blank in release.py - set it to your Nexus username before uploading")

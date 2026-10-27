@@ -1,39 +1,50 @@
 [size=5][b]Unlimited Ammo[/b][/size]
-Never run dry again. Choose your ammo mode at install, plus optional unlimited grenades.
 
-[b]Current version:[/b] {version} — built for game build {game_build}
+[b]Works on patch {game_version}, the current version of Space Marine 2.[/b]
+
+Older infinite ammo mods ship a copy of the game’s weapon files from the patch they were made for. A game update changes those files, and the outdated copies then crash the game. This mod is built from the current game files instead. It turns on infinite ammo settings that already exist in the game, which are the same settings enemy weapons use.
 
 [size=4][b]Options[/b][/size]
 [list]
-[*][b]Unlimited Reserve[/b] — your reserve ammo never runs out. You still reload.
-[*][b]No Reload[/b] — bottomless magazines. You never reload.
-[*][b]Unlimited Grenades[/b] (optional add-on) — frag, krak and shock grenades never run out.
+[*][b]Unlimited Reserve.[/b] Reserve ammo never runs out. Reloading works as normal.
+[*][b]No Reload.[/b] Magazines never empty, so reloading is never needed.
+[*][b]Unlimited Grenades.[/b] An optional add-on. Frag, krak, and shock grenades refill about half a second after each throw.
 [/list]
-Covers every player weapon in Campaign and Operations/Siege, including weapon perk variants like the underbarrel grenade launcher. [b]PvP is not affected.[/b]
-
-[size=4][b]Why another infinite ammo mod?[/b][/size]
-Older ammo mods ship a copy of the game's weapon file from whatever patch they were made for, so they break or crash when the game updates. This mod is generated straight from the current game files, and it uses the infinite-ammo switches the game already has (the same ones enemies use) instead of huge ammo numbers. When a patch drops, it's rebuilt in seconds.
+The options apply to every player weapon in PvE modes, including weapon perk variants such as the underbarrel grenade launcher. PvP is not affected.
 
 [size=4][b]Installation[/b][/size]
-[b]Vortex / MO2:[/b] Install the main file. A menu will ask which options you want.
-[b]Manual:[/b] See the README inside the download. Copy one ammo .pak (plus the optional grenades .pak) into [i]client_pc\root\mods[/i] and add each one to [i]pak_config.yaml[/i].
+With Vortex or Mod Organizer 2:
+[list=1]
+[*]Install the main file.
+[*]Choose an ammo mode in the installer menu.
+[*]Select Unlimited Grenades as well if wanted.
+[/list]
+Manual installation steps are in the README included in the download.
 
 [size=4][b]After a game update[/b][/size]
-If the game crashes after a patch, disable the mod until I upload a new version. If you can't wait, grab the optional [b]Patcher[/b] file: double-click [i]Run_Patcher.bat[/i] and it rebuilds the mod from your own game files (needs Python 3.10+).
+A game update can change the files this mod replaces. If the game crashes after an update, disable the mod until a new version is posted here. The optional Patcher file rebuilds the mod from the installed game files in a few seconds. It requires Python 3.10 or newer.
 
 [size=4][b]Compatibility[/b][/size]
-Conflicts with any mod that changes these files (whichever loads last wins):
+This mod conflicts with any mod that replaces the same game files. When two mods replace the same file, the one that loads last takes effect. Known conflicts are Astartes Overhaul, Primarch – Power Fantasy, and other infinite ammo mods.
+
+The files this mod replaces are listed below.
 [list]
 [*]ssl/weapons/creator/firearm_library_pve.sso
 [*]ssl/weapons/creator/customization/firearm_modificators_library.sso
-[*]ssl/abilities/ability_library.sso (grenades only)
+[*]ssl/abilities/ability_library.sso, only with Unlimited Grenades
 [/list]
-Known conflicts: [b]Astartes Overhaul[/b], [b]Primarch – Power Fantasy[/b], and other infinite-ammo mods.
 
 [size=4][b]Co-op[/b][/size]
-Works best solo or as host. Please don't use it in public lobbies with strangers.
+The mod is intended for solo play and private co-op. Public lobbies with strangers are not an appropriate place to use it.
+
+[size=4][b]Source code[/b][/size]
+The source code is public on GitHub under the MIT license.
+[url=https://github.com/QuietOrbit/sm2-unlimited-ammo]github.com/QuietOrbit/sm2-unlimited-ammo[/url]
+
+[size=4][b]AI disclosure[/b][/size]
+Claude Code was used in developing this mod. Claude Code is an AI coding assistant made by Anthropic. Every option was tested in game before release.
 
 [size=4][b]Changelog[/b][/size]
 [list]
-[*][b]{version}[/b] — Initial release (game build {game_build}).
+[*][b]{version}[/b] Initial release for patch {game_version}.
 [/list]
