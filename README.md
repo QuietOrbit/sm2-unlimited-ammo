@@ -4,9 +4,11 @@ Unlimited reserve ammo, a no-reload mode, and unlimited grenades for Space Marin
 
 **Players:** download the mod from Nexus Mods. This repo is the source that builds it.
 
-## Why it doesn't break on game updates
+I hope it keeps working through future game updates. If an update breaks it, I will post a fixed version as soon as I can.
 
-Most Space Marine 2 mods ship a copy of a game file from the patch they were made for, so they crash once the game updates. This mod is generated from your installed game files instead, and it only flips switches the game already supports:
+## What it changes
+
+The paks are built from the installed game's files.
 
 | Option | What it changes |
 |---|---|

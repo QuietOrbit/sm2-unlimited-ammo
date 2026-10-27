@@ -2,7 +2,7 @@
 
 [b]Works on patch {game_version}, the current version of Space Marine 2.[/b]
 
-Older infinite ammo mods ship a copy of the game’s weapon files from the patch they were made for. A game update changes those files, and the outdated copies then crash the game. This mod is built from the current game files instead. It turns on infinite ammo settings that already exist in the game, which are the same settings enemy weapons use.
+I hope it keeps working through future game updates. If an update breaks it, I will post a fixed version here as soon as I can.
 
 [size=4][b]Options[/b][/size]
 [list]
