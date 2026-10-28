@@ -54,5 +54,6 @@ Claude Code was used in developing this mod. Claude Code is an AI coding assista
 
 [size=4][b]Changelog[/b][/size]
 [list]
-[*][b]{version}[/b] Initial release for patch {game_version}.
+[*][b]1.1.0[/b] Adds Astartes Overhaul support through the optional Patcher file. The installer now lists the author and links to this page.
+[*][b]1.0.0[/b] Initial release for patch 15.2.
 [/list]

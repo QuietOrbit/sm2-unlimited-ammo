@@ -16,7 +16,7 @@ from xml.sax.saxutils import escape
 
 import build_mod as b
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 GAME_VERSION = "15.2"  # game patch this release was tested on
 AUTHOR = "QuietOrbit"  # Nexus username
 MOD_NAME = "Unlimited Ammo"

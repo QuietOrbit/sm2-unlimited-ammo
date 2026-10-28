@@ -45,9 +45,9 @@ python release.py                                # build the Nexus zips and page
 ## Releasing after a game patch
 
 1. `python test_build.py`
-2. Bump `VERSION` in `release.py`
+2. Bump `VERSION` (and `GAME_VERSION` after a game patch) in `release.py`, and add a changelog entry at the bottom of `release/nexus_description.txt`
 3. `python release.py`
-4. Upload `dist/UnlimitedAmmo-<version>.zip` (main) and `dist/UnlimitedAmmo-Patcher-<version>.zip` (optional) to Nexus, and add a changelog entry.
+4. Upload `dist/UnlimitedAmmo-<version>.zip` (main) and `dist/UnlimitedAmmo-Patcher-<version>.zip` (optional) to Nexus, and paste `dist/nexus_description.txt` into the mod page.
 
 ## Layout
 
