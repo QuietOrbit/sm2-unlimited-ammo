@@ -55,27 +55,14 @@ installed game files in a few seconds (requires Python 3.10+).
 CONFLICTS
 ---------
 Space Marine 2 mods replace whole files. Any mod that changes these files
-will conflict. The mod listed HIGHER in pak_config.yaml wins.
+will conflict, and whichever loads last wins:
 
   ssl/weapons/creator/firearm_library_pve.sso                    (ammo)
   ssl/weapons/creator/customization/firearm_modificators_library.sso (ammo)
   ssl/abilities/ability_library.sso                               (grenades)
 
-Known conflicts: Primarch - Power Fantasy and other infinite-ammo mods.
-Turn off any other infinite-ammo mod before using this one.
-
-
-ASTARTES OVERHAUL
------------------
-The main download conflicts with Astartes Overhaul. Use the optional
-"Patcher" download instead:
-
-1. Enable Astartes Overhaul and deploy it in Vortex.
-2. Run Run_Patcher.bat and pick your options.
-
-The Patcher builds this mod on top of your installed Overhaul files, so both
-mods work together, and lists it above Overhaul in pak_config.yaml.
-If Vortex deploys again afterwards, run the Patcher again.
+Known conflicts: Astartes Overhaul, Primarch - Power Fantasy, and older
+infinite-ammo mods. Turn off any other infinite-ammo mod before using this one.
 
 
 CO-OP

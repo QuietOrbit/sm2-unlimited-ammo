@@ -25,21 +25,13 @@ Manual installation steps are in the README included in the download.
 A game update can change the files this mod replaces. If the game crashes after an update, disable the mod until a new version is posted here. The optional Patcher file rebuilds the mod from the installed game files in a few seconds. It requires Python 3.10 or newer.
 
 [size=4][b]Compatibility[/b][/size]
-This mod conflicts with any mod that replaces the same game files. When two mods replace the same file, the one listed higher in pak_config.yaml takes effect. Known conflicts are Primarch – Power Fantasy and other infinite ammo mods.
+This mod conflicts with any mod that replaces the same game files. When two mods replace the same file, the one that loads last takes effect. Known conflicts are Astartes Overhaul, Primarch – Power Fantasy, and other infinite ammo mods.
 
 The files this mod replaces are listed below.
 [list]
 [*]ssl/weapons/creator/firearm_library_pve.sso
 [*]ssl/weapons/creator/customization/firearm_modificators_library.sso
 [*]ssl/abilities/ability_library.sso, only with Unlimited Grenades
-[/list]
-
-[size=4][b]Astartes Overhaul[/b][/size]
-The main download conflicts with Astartes Overhaul. The optional Patcher file resolves this. When Astartes Overhaul is installed and enabled, the Patcher builds this mod on top of the Overhaul files, so both mods work together. It also lists this mod above Overhaul in pak_config.yaml.
-[list=1]
-[*]Enable Astartes Overhaul and deploy it in Vortex.
-[*]Run Run_Patcher.bat and pick the options.
-[*]Run the Patcher again whenever Vortex deploys.
 [/list]
 
 [size=4][b]Co-op[/b][/size]
@@ -54,6 +46,5 @@ Claude Code was used in developing this mod. Claude Code is an AI coding assista
 
 [size=4][b]Changelog[/b][/size]
 [list]
-[*][b]1.1.0[/b] Adds Astartes Overhaul support through the optional Patcher file. The installer now lists the author and links to this page.
-[*][b]1.0.0[/b] Initial release for patch 15.2.
+[*][b]{version}[/b] Initial release for patch {game_version}.
 [/list]

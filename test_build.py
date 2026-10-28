@@ -4,9 +4,7 @@
 """
 import re
 import sys
-import tempfile
 import zipfile
-from pathlib import Path
 
 import build_mod as b
 
@@ -19,31 +17,6 @@ def grenade_blocks(text: str) -> dict[str, str]:
         end = lines.index("   }", start)
         blocks[name] = "\r\n".join(lines[start:end + 1])
     return blocks
-
-
-def check_load_order() -> list[str]:
-    """Earlier pak_config.yaml entries win, so a build on top of Overhaul must be listed above it."""
-    config = ("- pak: other.pak\n  disabled: false\n"
-              "- pak: wa_astartes_15_2.pak\n  disabled: false\n"
-              "- pak: later.pak\n  disabled: false\n")
-    order = lambda mods: re.findall(r"- pak: (\S+)", (mods / "pak_config.yaml").read_text())
-    failures = []
-    with tempfile.TemporaryDirectory() as tmp:
-        mods = Path(tmp)
-        (mods / "pak_config.yaml").write_text(config)
-        b.set_installed(mods, [b.PAK_RESERVE, b.PAK_GRENADES], above="wa_astartes_15_2.pak")
-        got = order(mods)
-        if got != ["other.pak", b.PAK_RESERVE, b.PAK_GRENADES, "wa_astartes_15_2.pak", "later.pak"]:
-            failures.append(f"build on Overhaul not listed above it: {got}")
-        # Reinstalling must move existing entries, not duplicate them.
-        b.set_installed(mods, [b.PAK_RESERVE], above="wa_astartes_15_2.pak")
-        if order(mods).count(b.PAK_RESERVE) != 1 or b.PAK_GRENADES in order(mods):
-            failures.append(f"reinstall left stale entries: {order(mods)}")
-        (mods / "pak_config.yaml").write_text(config)
-        b.set_installed(mods, [b.PAK_RESERVE])
-        if order(mods)[-1] != b.PAK_RESERVE:
-            failures.append(f"vanilla build not listed last: {order(mods)}")
-    return failures
 
 
 def main() -> int:
@@ -80,8 +53,6 @@ def main() -> int:
         outside_new = outside_new.replace(grenade_blocks(patched)[name], "")
     if strip(outside_orig) != strip(outside_new):
         failures.append("lines outside the grenade blocks changed")
-
-    failures += check_load_order()
 
     for f in failures:
         print("FAIL", f)

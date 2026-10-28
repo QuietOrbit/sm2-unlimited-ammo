@@ -20,12 +20,6 @@ The grenade charges stay a small finite pool on purpose. Grenade pickups spawn o
 
 PvP data (`*_pvp.sso`) is never touched.
 
-## Astartes Overhaul compatibility
-
-With `--install`, the script looks for an enabled `wa_astartes*.pak` in the game's mods folder. If it finds one, it patches Overhaul's copies of the files instead of the base game's, so both mods' changes are kept. Overhaul's files are never redistributed. Each player builds from their own copy.
-
-Earlier entries in `pak_config.yaml` take priority over later ones. The script therefore lists its paks directly above Overhaul. Pass `--vanilla` to skip detection.
-
 ## Requirements
 
 - Python 3.10+
@@ -45,9 +39,9 @@ python release.py                                # build the Nexus zips and page
 ## Releasing after a game patch
 
 1. `python test_build.py`
-2. Bump `VERSION` (and `GAME_VERSION` after a game patch) in `release.py`, and add a changelog entry at the bottom of `release/nexus_description.txt`
+2. Bump `VERSION` in `release.py`
 3. `python release.py`
-4. Upload `dist/UnlimitedAmmo-<version>.zip` (main) and `dist/UnlimitedAmmo-Patcher-<version>.zip` (optional) to Nexus, and paste `dist/nexus_description.txt` into the mod page.
+4. Upload `dist/UnlimitedAmmo-<version>.zip` (main) and `dist/UnlimitedAmmo-Patcher-<version>.zip` (optional) to Nexus, and add a changelog entry.
 
 ## Layout
 
