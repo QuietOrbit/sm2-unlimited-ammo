@@ -20,6 +20,12 @@ The grenade charges stay a small finite pool on purpose. Grenade pickups spawn o
 
 PvP data (`*_pvp.sso`) is never touched.
 
+## Astartes Overhaul compatibility
+
+With `--install`, the script looks for an enabled `wa_astartes*.pak` in the game's mods folder. If it finds one, it patches Overhaul's copies of the files instead of the base game's, so both mods' changes are kept. Overhaul's files are never redistributed. Each player builds from their own copy.
+
+Earlier entries in `pak_config.yaml` take priority over later ones. The script therefore lists its paks directly above Overhaul. Pass `--vanilla` to skip detection.
+
 ## Requirements
 
 - Python 3.10+
