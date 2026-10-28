@@ -18,7 +18,7 @@ import build_mod as b
 
 VERSION = "1.0.0"
 GAME_VERSION = "15.2"  # game patch this release was tested on
-AUTHOR = ""  # your Nexus username
+AUTHOR = "QuietOrbit"  # Nexus username
 MOD_NAME = "Unlimited Ammo"
 NEXUS_URL = ""  # fill in after creating the Nexus page
 
