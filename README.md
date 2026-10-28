@@ -2,7 +2,7 @@
 
 Unlimited reserve ammo, a no-reload mode, and unlimited grenades for Space Marine 2 (PvE only).
 
-**Players:** download the mod from Nexus Mods. This repo is the source that builds it.
+**Players:** download the mod from [Nexus Mods](https://www.nexusmods.com/warhammer40000spacemarine2/mods/626). This repo is the source that builds it.
 
 I hope it keeps working through future game updates. If an update breaks it, I will post a fixed version as soon as I can.
 
