@@ -9,6 +9,7 @@ Builds the paks from your installed game, then writes to dist/:
 
 Bump VERSION for every upload.
 """
+import shutil
 import sys
 import zipfile
 from pathlib import Path
@@ -16,7 +17,7 @@ from xml.sax.saxutils import escape
 
 import build_mod as b
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 GAME_VERSION = "15.2"  # game patch this release was tested on
 AUTHOR = "QuietOrbit"  # Nexus username
 MOD_NAME = "Unlimited Ammo"
@@ -92,22 +93,63 @@ def fill(template: str) -> str:
             .replace("{author_line}", author_line))
 
 
-def main() -> int:
-    game = b.find_game()
-    if game is None:
-        print("Couldn't find Space Marine 2 through Steam.")
-        return 1
-    b.build(game / "client_pc" / "root" / "paks" / "client" / "default" / "default_other.pak")
+OVERHAUL_README = """UNLIMITED AMMO {version} - built on top of {overhaul}
 
-    readme = fill((TEMPLATES / "README.txt").read_text(encoding="utf-8")).replace("\n", "\r\n")
+PERSONAL BUILD. These paks contain Astartes Overhaul's weapon and ability
+files with this mod's changes applied. Do not upload them anywhere without
+the Overhaul author's permission.
 
-    main_zip = b.DIST / f"UnlimitedAmmo-{VERSION}.zip"
-    with zipfile.ZipFile(main_zip, "w", zipfile.ZIP_DEFLATED) as z:
+Contents
+  UnlimitedAmmo-{version}-Overhaul.zip   FOMOD installer zip (Vortex / MO2), ready for upload once allowed
+  1 - Unlimited Reserve, 2 - No Reload, 3 - Unlimited Grenades   the same paks, loose
+
+They must be listed ABOVE {overhaul} in pak_config.yaml. The installer
+zip does not set that order, so after installing check pak_config.yaml, or
+use the one-step install from the project folder instead:
+
+  python build_mod.py --install no-reload --grenades
+
+That rebuilds from your current game and Overhaul files, lists the paks above
+Overhaul, and is the safest option after any game or Overhaul update.
+"""
+
+
+def write_main_zip(path: Path, readme: str) -> None:
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr("fomod/info.xml", info_xml())
         z.writestr("fomod/ModuleConfig.xml", module_config())
         for folder, pak, _, _ in AMMO_OPTIONS + [GRENADE_OPTION]:
             z.write(b.DIST / pak, f"{folder}/{pak}")
         z.writestr("README.txt", readme)
+
+
+def main() -> int:
+    game = b.find_game()
+    if game is None:
+        print("Couldn't find Space Marine 2 through Steam.")
+        return 1
+    source_pak = game / "client_pc" / "root" / "paks" / "client" / "default" / "default_other.pak"
+
+    readme = fill((TEMPLATES / "README.txt").read_text(encoding="utf-8")).replace("\n", "\r\n")
+
+    # Personal build on top of Astartes Overhaul. Not for upload without the author's permission.
+    overhaul = b.find_overhaul(game / "client_pc" / "root" / "mods")
+    if overhaul:
+        b.build(source_pak, overhaul)
+        folder = b.DIST / "UnlimitedAmmo-Overhaul"
+        shutil.rmtree(folder, ignore_errors=True)
+        folder.mkdir()
+        write_main_zip(folder / f"UnlimitedAmmo-{VERSION}-Overhaul.zip", readme)
+        for sub, pak, _, _ in AMMO_OPTIONS + [GRENADE_OPTION]:
+            (folder / sub).mkdir()
+            shutil.copy2(b.DIST / pak, folder / sub / pak)
+        (folder / "README.txt").write_text(OVERHAUL_README.format(version=VERSION, overhaul=overhaul.name),
+                                           encoding="utf-8", newline="\r\n")
+        print(f"wrote {folder} (built on {overhaul.name})")
+
+    b.build(source_pak)
+    main_zip = b.DIST / f"UnlimitedAmmo-{VERSION}.zip"
+    write_main_zip(main_zip, readme)
     print(f"wrote {main_zip}")
 
     patcher_zip = b.DIST / f"UnlimitedAmmo-Patcher-{VERSION}.zip"

@@ -7,6 +7,7 @@ Pick one ammo mode, plus optional unlimited grenades:
 
   Unlimited Reserve   Your reserve ammo never runs out. You still reload.
   No Reload           Bottomless magazines. You never reload.
+  Both ammo modes     Weapons also never overheat.
   Unlimited Grenades  Frag, krak and shock grenades never run out.
 
 Covers every player weapon in Campaign and Operations/Siege, including the
@@ -55,14 +56,20 @@ installed game files in a few seconds (requires Python 3.10+).
 CONFLICTS
 ---------
 Space Marine 2 mods replace whole files. Any mod that changes these files
-will conflict, and whichever loads last wins:
+will conflict. The mod listed HIGHER in pak_config.yaml wins.
 
   ssl/weapons/creator/firearm_library_pve.sso                    (ammo)
   ssl/weapons/creator/customization/firearm_modificators_library.sso (ammo)
   ssl/abilities/ability_library.sso                               (grenades)
 
-Known conflicts: Astartes Overhaul, Primarch - Power Fantasy, and older
-infinite-ammo mods. Turn off any other infinite-ammo mod before using this one.
+Known conflicts: Primarch - Power Fantasy and other infinite-ammo mods.
+Turn off any other infinite-ammo mod before using this one.
+
+
+ASTARTES OVERHAUL
+-----------------
+Astartes Overhaul replaces the same weapon files, so the two mods conflict.
+There is no compatible version at the moment.
 
 
 CO-OP

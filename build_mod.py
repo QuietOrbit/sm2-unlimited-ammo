@@ -10,10 +10,16 @@ current patch. Rerun this after every game update.
     python build_mod.py --install none --grenades      # unlimited grenades only
     python build_mod.py --uninstall                    # remove everything this mod installed
 
+When installing, an enabled Astartes Overhaul in the game's mods folder is detected
+and the mod is built on top of its files, keeping Overhaul's changes. Pass --vanilla
+to build from the base game anyway. Earlier entries in pak_config.yaml take priority,
+so the mod is listed just above Overhaul.
+
 PvP data (firearm_library_pvp.sso, ability_library_pvp.sso) is never touched.
 """
 import argparse
 import re
+from contextlib import nullcontext
 import shutil
 import sys
 import zipfile
@@ -39,6 +45,10 @@ GRENADES = ["equipment_frag_grenade", "equipment_krak_grenade", "equipment_shock
 
 CLIP_TYPE = re.compile(r'^(?P<indent>[ \t]*)__type   =   "ClipSettings"\s*$')
 FLAG = re.compile(r'^[ \t]*(isInfiniteAmmo|isInfiniteClip)   =   ')
+HEAT_VALUE = re.compile(r"^([ \t]*value   =   )\S+$")
+HEATING_SPEED = re.compile(r"^([ \t]*continuousHeatingSpeed   =   )\S+$")
+LAUNCHER_POOL = re.compile(r"^(?P<indent>[ \t]*)ammo_grenade(?:_tac_reserve)?   =   \{$")
+OVERHEAT_FLAG = re.compile(r"^([ \t]*(?:isOverheatAffectingShooting|isShootingForbiddenWhileOverheated)   =   )True$")
 
 
 class FormatChanged(Exception):
@@ -77,6 +87,55 @@ def patch_clip_settings(text: str, no_reload: bool) -> tuple[str, int]:
         patched += 1
     if patched == 0:
         raise FormatChanged("no ClipSettings blocks found")
+    return "\r\n".join(out), patched
+
+
+def patch_overheat(text: str) -> tuple[str, int]:
+    """Stop weapons building heat. Returns (text, settings changed).
+
+    Heat per shot and continuous heating go to zero, and the flags that block
+    shooting while overheated are cleared as a backstop. Perk modificators only
+    add to or scale those numbers, so zero stays zero.
+    """
+    lines = text.split("\r\n")
+    changed = 0
+    for i, line in enumerate(lines):
+        new = None
+        if HEAT_VALUE.match(line) and i + 1 < len(lines) and '"HeatPercentPerShot"' in lines[i + 1]:
+            new = HEAT_VALUE.sub(r"\g<1>0", line)
+        elif HEATING_SPEED.match(line):
+            new = HEATING_SPEED.sub(r"\g<1>0", line)
+        elif OVERHEAT_FLAG.match(line):
+            new = OVERHEAT_FLAG.sub(r"\g<1>False", line)
+        if new is not None and new != line:
+            lines[i] = new
+            changed += 1
+    if changed == 0:
+        raise FormatChanged("no overheat settings found")
+    return "\r\n".join(lines), changed
+
+
+def patch_launcher_ammo(text: str) -> tuple[str, int]:
+    """Give the underbarrel grenade launcher a real reserve. Returns (text, pools patched).
+
+    The launcher's reserve pools are capped at 0 (or left unset) because the stock
+    weapon only ever fires its clip, so the infinite-ammo flag has nothing to refill
+    the clip from and a reload comes up empty.
+    """
+    lines = text.split("\r\n")
+    out: list[str] = []
+    patched = 0
+    for i, line in enumerate(lines):
+        out.append(line)
+        m = LAUNCHER_POOL.match(line)
+        if not m:
+            continue
+        indent = m.group("indent") + "   "
+        if lines[i + 1].startswith(f"{indent}maxAmount   =   "):
+            lines[i + 1] = f"{indent}maxAmount   =   999"
+        else:
+            out.append(f"{indent}maxAmount   =   999")
+        patched += 1
     return "\r\n".join(out), patched
 
 
@@ -141,16 +200,24 @@ def write_pak(path: Path, files: dict[str, bytes]) -> None:
             z.writestr(zipfile.ZipInfo(name), data)
 
 
-def build(source_pak: Path) -> None:
-    with zipfile.ZipFile(source_pak) as z:
-        ammo_src = {name: z.read(name).decode("utf-8") for name in AMMO_FILES}
-        ability_src = z.read(ABILITY_FILE).decode("utf-8")
+def build(source_pak: Path, base_pak: Path | None = None) -> None:
+    """Build all paks. Files present in base_pak (another mod) are patched instead of the game's."""
+    with zipfile.ZipFile(source_pak) as game, \
+            (zipfile.ZipFile(base_pak) if base_pak else nullcontext()) as base:
+        def read(name: str) -> str:
+            z = base if base and name in base.NameToInfo else game
+            return z.read(name).decode("utf-8")
+        ammo_src = {name: read(name) for name in AMMO_FILES}
+        ability_src = read(ABILITY_FILE)
 
     DIST.mkdir(exist_ok=True)
     for pak, no_reload in ((PAK_RESERVE, False), (PAK_NO_RELOAD, True)):
         files = {}
         for name, text in ammo_src.items():
             patched, count = patch_clip_settings(text, no_reload)
+            patched, count = patch_overheat(patched)
+            patched, count = patch_launcher_ammo(patched)
+            patched, count = patch_launcher_ammo(patched)
             files[name] = patched.encode("utf-8")
         write_pak(DIST / pak, files)
         print(f"built dist/{pak}")
@@ -158,8 +225,23 @@ def build(source_pak: Path) -> None:
     print(f"built dist/{PAK_GRENADES}")
 
 
-def set_installed(mods_dir: Path, paks: list[str]) -> None:
-    """Make exactly `paks` the installed set of this mod's paks, in files and pak_config.yaml."""
+def find_overhaul(mods_dir: Path) -> Path | None:
+    """Return the enabled Astartes Overhaul pak in the game's mods folder, if any."""
+    cfg = mods_dir / "pak_config.yaml"
+    text = cfg.read_text(encoding="utf-8") if cfg.exists() else ""
+    enabled = {m.group(1) for m in re.finditer(r"- pak: (\S+)\n  disabled: false", text)}
+    for pak in sorted(mods_dir.glob("wa_astartes*.pak")):
+        if pak.name in enabled:
+            return pak
+    return None
+
+
+def set_installed(mods_dir: Path, paks: list[str], above: str | None = None) -> None:
+    """Make exactly `paks` the installed set of this mod's paks, in files and pak_config.yaml.
+
+    Earlier entries in pak_config.yaml take priority, so pass `above` (a pak name) to list
+    ours just before the mod they were built on top of. Otherwise they go at the end.
+    """
     for name in MANAGED_PAKS:
         if name not in paks:
             (mods_dir / name).unlink(missing_ok=True)
@@ -173,7 +255,12 @@ def set_installed(mods_dir: Path, paks: list[str]) -> None:
         text = re.sub(rf"- pak: {re.escape(name)}\n(  [^\n]*\n)*", "", text)
     if text and not text.endswith("\n"):
         text += "\n"
-    text += "".join(f"- pak: {name}\n  disabled: false\n" for name in paks)
+    entries = "".join(f"- pak: {name}\n  disabled: false\n" for name in paks)
+    anchor = re.search(rf"^- pak: {re.escape(above)}\n", text, re.M) if above else None
+    if anchor:
+        text = text[:anchor.start()] + entries + text[anchor.start():]
+    else:
+        text += entries
     if text != original:
         if cfg.exists():
             shutil.copy2(cfg, cfg.with_suffix(".yaml.bak"))
@@ -187,6 +274,8 @@ def main() -> int:
                     help="install into the game: ammo mode to use")
     ap.add_argument("--grenades", action="store_true", help="with --install, also install unlimited grenades")
     ap.add_argument("--uninstall", action="store_true", help="remove everything this mod installed")
+    ap.add_argument("--vanilla", action="store_true",
+                    help="build from the base game even if Astartes Overhaul is installed")
     args = ap.parse_args()
 
     game = args.game or find_game()
@@ -206,8 +295,11 @@ def main() -> int:
         print("Unlimited Ammo removed.")
         return 0
 
+    overhaul = None if args.vanilla or not args.install else find_overhaul(mods_dir)
+    if overhaul:
+        print(f"Astartes Overhaul detected ({overhaul.name}) - building on top of it.")
     try:
-        build(source_pak)
+        build(source_pak, overhaul)
     except (FormatChanged, KeyError) as e:
         print(f"Build failed - the game's data format may have changed: {e}")
         return 1
@@ -217,7 +309,7 @@ def main() -> int:
         if args.grenades:
             paks.append(PAK_GRENADES)
         mods_dir.mkdir(exist_ok=True)
-        set_installed(mods_dir, paks)
+        set_installed(mods_dir, paks, above=overhaul.name if overhaul else None)
         print(f"Installed to {mods_dir}: {', '.join(paks) or 'nothing'}")
     return 0
 

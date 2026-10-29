@@ -8,6 +8,7 @@ I hope it keeps working through future game updates. If an update breaks it, I w
 [list]
 [*][b]Unlimited Reserve.[/b] Reserve ammo never runs out. Reloading works as normal.
 [*][b]No Reload.[/b] Magazines never empty, so reloading is never needed.
+[*][b]No overheating.[/b] Included with both ammo modes. Heat-based weapons never build heat, so they never overheat or lock up.
 [*][b]Unlimited Grenades.[/b] An optional add-on. Frag, krak, and shock grenades refill about half a second after each throw.
 [/list]
 The options apply to every player weapon in PvE modes, including weapon perk variants such as the underbarrel grenade launcher. PvP is not affected.
@@ -25,7 +26,7 @@ Manual installation steps are in the README included in the download.
 A game update can change the files this mod replaces. If the game crashes after an update, disable the mod until a new version is posted here. The optional Patcher file rebuilds the mod from the installed game files in a few seconds. It requires Python 3.10 or newer.
 
 [size=4][b]Compatibility[/b][/size]
-This mod conflicts with any mod that replaces the same game files. When two mods replace the same file, the one that loads last takes effect. Known conflicts are Astartes Overhaul, Primarch – Power Fantasy, and other infinite ammo mods.
+This mod conflicts with any mod that replaces the same game files. When two mods replace the same file, the one listed higher in pak_config.yaml takes effect. Known conflicts are Primarch – Power Fantasy, Astartes Overhaul, and other infinite ammo mods.
 
 The files this mod replaces are listed below.
 [list]
@@ -33,6 +34,9 @@ The files this mod replaces are listed below.
 [*]ssl/weapons/creator/customization/firearm_modificators_library.sso
 [*]ssl/abilities/ability_library.sso, only with Unlimited Grenades
 [/list]
+
+[size=4][b]Astartes Overhaul[/b][/size]
+Astartes Overhaul replaces the same weapon files, so the two mods conflict. There is no compatible version at the moment.
 
 [size=4][b]Co-op[/b][/size]
 The mod is intended for solo play and private co-op. Public lobbies with strangers are not an appropriate place to use it.
@@ -44,7 +48,14 @@ The source code is public on GitHub under the MIT license.
 [size=4][b]AI disclosure[/b][/size]
 Claude Code was used in developing this mod. Claude Code is an AI coding assistant made by Anthropic. Every option was tested in game before release.
 
-[size=4][b]Changelog[/b][/size]
+[size=4][b]Version history[/b][/size]
+[b]1.1.0[/b] (tested on patch {game_version})
 [list]
-[*][b]{version}[/b] Initial release for patch {game_version}.
+[*]Added: weapons no longer overheat. Heat per shot and continuous heating are set to zero, and the shooting locks that apply while overheated are removed. This applies to both ammo modes.
+[*]Fixed: the underbarrel grenade launcher could show infinite ammo but stop firing once its magazine ran out. Its reserve is now filled so it keeps firing and reloading.
+[*]Changed: the installer lists the author and links to this page.
+[/list]
+[b]1.0.0[/b] (tested on patch 15.2)
+[list]
+[*]Initial release: Unlimited Reserve, No Reload, and Unlimited Grenades options for PvE.
 [/list]

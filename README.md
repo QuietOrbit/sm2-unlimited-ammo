@@ -14,11 +14,18 @@ The paks are built from the installed game's files.
 |---|---|
 | Unlimited Reserve | Sets `isInfiniteAmmo = True` on every `ClipSettings` block in `firearm_library_pve.sso` and `firearm_modificators_library.sso` |
 | No Reload | Same, plus `isInfiniteClip = True` |
+| Both ammo modes | Also zero heat per shot and continuous heating, clear the overheat shooting locks, and give the underbarrel grenade launcher a 999 reserve (stock is 0) |
 | Unlimited Grenades | Adds an `EnergyTimerRegen` (recoverSpeed 200) to frag, krak, and shock grenades in `ability_library.sso` |
 
 The grenade charges stay a small finite pool on purpose. Grenade pickups spawn one model per charge, so the game's infinite ability resource (2^31-1 charges) crashes on load.
 
 PvP data (`*_pvp.sso`) is never touched.
+
+## Astartes Overhaul compatibility
+
+With `--install`, the script looks for an enabled `wa_astartes*.pak` in the game's mods folder. If it finds one, it patches Overhaul's copies of the files instead of the base game's, so both mods' changes are kept. Overhaul's files are never redistributed. Each player builds from their own copy.
+
+Earlier entries in `pak_config.yaml` take priority over later ones. The script therefore lists its paks directly above Overhaul. Pass `--vanilla` to skip detection.
 
 ## Requirements
 
@@ -39,9 +46,9 @@ python release.py                                # build the Nexus zips and page
 ## Releasing after a game patch
 
 1. `python test_build.py`
-2. Bump `VERSION` in `release.py`
+2. Bump `VERSION` (and `GAME_VERSION` after a game patch) in `release.py`, and add a changelog entry at the bottom of `release/nexus_description.txt`
 3. `python release.py`
-4. Upload `dist/UnlimitedAmmo-<version>.zip` (main) and `dist/UnlimitedAmmo-Patcher-<version>.zip` (optional) to Nexus, and add a changelog entry.
+4. Upload `dist/UnlimitedAmmo-<version>.zip` (main) and `dist/UnlimitedAmmo-Patcher-<version>.zip` (optional) to Nexus, and paste `dist/nexus_description.txt` into the mod page.
 
 ## Layout
 
